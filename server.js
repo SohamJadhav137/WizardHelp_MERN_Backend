@@ -9,10 +9,34 @@ import gigRoutes from "./routes/gigRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import conversationRoutes from "./routes/conversationRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
+import http from "http";
+import { Server } from "socket.io";
+
 // It loads .env variables into process.env
 dotenv.config();
 
 const app = express();
+
+////////////// Socket.io setup ///////////////////////
+
+const server = http.createServer(app);
+
+const io = new Server(server, {
+    cors : {
+        origin: "http://localhost:5173",
+        methods: ["GET", "POST"]
+    }
+});
+
+connectDB();
+
+io.on("connection", (socket) => {
+    console.log("🟢 User connected:", socket.id);
+
+    socket.on("disconnect", () => {
+        console.log("🔴 User disconnected:", socket.id);
+    });
+});
 
 // It allows frontend at port 5173 to communicate with this server
 // app.use(cors({origin: "http://localhost:5173", credentials: true}));
@@ -39,8 +63,12 @@ app.use('/api/messages', messageRoutes);
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-    // Asyncshronously initiates connection to MongoDB
-    connectDB();
-    console.log(`Server running on port ${PORT}`);
-});
+//////////////////// COMMENTING BELOW CODE FOR SOCKET.IO /////////////////////////
+
+// app.listen(PORT, () => {
+//     // Asyncshronously initiates connection to MongoDB
+//     connectDB();
+//     console.log(`Server running on port ${PORT}`);
+// });
+
+server.listen(PORT, () => console.log(`Server running on ${PORT}`));

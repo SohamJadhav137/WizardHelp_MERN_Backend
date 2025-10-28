@@ -7,7 +7,7 @@ export const sendMessage = async (req, res) => {
 
         const {conversationId, text} = req.body;
         
-        const conv = await Conversation.find(conversationId);
+        const conv = await Conversation.findById(conversationId);
         
         if(!conv) return res.status(400).json({ message: "Conversation not found!"});
         
@@ -19,7 +19,7 @@ export const sendMessage = async (req, res) => {
         
         const saved = await message.save();
         
-        const lastMessage = text;
+        conv.lastMessage = text;
         
         if(req.user._id.toString() === conv.sellerId.toString()){
             conv.readBySeller = true;
@@ -41,10 +41,11 @@ export const sendMessage = async (req, res) => {
 
 export const getMessages = async (req, res) => {
     try{
-        const conversationId = req.params._id;
+        const conversationId = req.params.id;
         if(!conversationId) return res.status(400).json({ message: "CoversationId required!"});
-        
+
         const messages = await Message.find({ conversationId }).sort({ createdAt: 1 });
+        
         return res.status(200).json(messages);
     } catch(error) {
         console.error("CUSTOM ERROR:",error);
