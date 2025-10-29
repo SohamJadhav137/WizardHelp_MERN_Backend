@@ -17,35 +17,45 @@ dotenv.config();
 
 const app = express();
 
+app.use(cors({origin: "http://localhost:5173", methods: ["GET", "POST"], credentials: true}));
+
 ////////////// Socket.io setup ///////////////////////
 
 const server = http.createServer(app);
 
+// Linking socket.io with http server
 const io = new Server(server, {
     cors : {
         origin: "http://localhost:5173",
-        methods: ["GET", "POST"]
+        methods: ["GET", "POST"],
+        credentials: true
     }
 });
 
+app.use(express.json());
+
 connectDB();
 
+// Things to perform after client connects with the server
 io.on("connection", (socket) => {
     console.log("🟢 User connected:", socket.id);
 
+    socket.on("sendMessage", (data) => {
+        console.log("Received message:",data);
+        io.emit("receiveMessage", data);
+    });
+
+
     socket.on("disconnect", () => {
         console.log("🔴 User disconnected:", socket.id);
-    });
+    });    
 });
 
 // It allows frontend at port 5173 to communicate with this server
-// app.use(cors({origin: "http://localhost:5173", credentials: true}));
-app.use(cors()); // Temporarily allow all origins
+// app.use(cors()); // Temporarily allow all originss
 // Parse incoming JSON data in the request body
-app.use(express.json());
 // Parse cookies from incoming request
 app.use(cookieParser());
-
 
 // app.get('/api/logged-in', protect, (req, res) => {
     //     res.json({ message: `Welcome ${req.user.name}`, user: req.user });
