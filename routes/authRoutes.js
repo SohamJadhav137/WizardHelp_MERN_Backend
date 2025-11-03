@@ -11,7 +11,8 @@ router.post('/register', [
 ], registerUser);
 
 router.post('/login', [
-    body("email").isEmail().withMessage("Invalid email!")
+    body("email").isEmail().withMessage("Invalid email!"),
+    body("password").notEmpty().withMessage("Password is required!")
 ], loginUser);
 
 router.post('/logout', logoutUser);

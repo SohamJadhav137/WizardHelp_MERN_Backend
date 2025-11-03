@@ -66,7 +66,7 @@ io.on("connection", (socket) => {
 // app.use(cors()); // Temporarily allow all originss
 // Parse incoming JSON data in the request body
 // Parse cookies from incoming request
-app.use(cookieParser());
+// app.use(cookieParser());
 
 // app.get('/api/logged-in', protect, (req, res) => {
     //     res.json({ message: `Welcome ${req.user.name}`, user: req.user });
