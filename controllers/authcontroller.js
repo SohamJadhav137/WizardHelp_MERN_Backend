@@ -1,3 +1,4 @@
+import { validationResult } from "express-validator";
 import User from "../models/user.js"; 
 import jwt from "jsonwebtoken"
 
@@ -31,6 +32,10 @@ const sendTokenResponse = (user, res, statusCode) => {
 };
 
 export const registerUser = async (req, res) => {
+    const errors = validationResult(req);
+    if(!errors.isEmpty())
+        return res.status(400).json({ message: errors.array()[0].msg})
+    
     const {name, email, password, role} = req.body;
 
     try{
@@ -51,6 +56,7 @@ export const registerUser = async (req, res) => {
         //     token
         // });
     } catch (error) {
+        console.error("CUSTOM ERROR:",error);
         res.status(500).json({message: "Server error!"});
     }
 };

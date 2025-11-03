@@ -40,9 +40,20 @@ connectDB();
 io.on("connection", (socket) => {
     console.log("🟢 User connected:", socket.id);
 
-    socket.on("sendMessage", (data) => {
-        console.log("Received message:",data);
-        io.emit("receiveMessage", data);
+    socket.on("join_conversation", (conversationId) => {
+        socket.join(conversationId);
+        console.log("User joined conversation of Id:",conversationId);
+    });
+
+    socket.on("send_message", (data) => {
+        const {conversationId, senderId, text} = data;
+        // console.log("Received message:",data);
+        // io.emit("receiveMessage", data);
+        io.to(conversationId).emit("receive_message", {
+            senderId,
+            text,
+            createdAt: new Date()
+        });
     });
 
 
