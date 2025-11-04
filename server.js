@@ -38,27 +38,31 @@ connectDB();
 
 // Things to perform after client connects with the server
 io.on("connection", (socket) => {
-    console.log("🟢 User connected:", socket.id);
+    const { userId, username } = socket.handshake.auth;
+    socket.userId = userId;
+    socket.username = username;
+    console.log(`🟢 ${username} at socket id connected: ${socket.id}`);
 
     socket.on("join_conversation", (conversationId) => {
         socket.join(conversationId);
-        console.log("User joined conversation of Id:",conversationId);
+        console.log(`${username} joined conversation of Id: ${conversationId}`);
     });
 
     socket.on("send_message", (data) => {
-        const {conversationId, senderId, text} = data;
+        const {conversationId, text} = data;
         // console.log("Received message:",data);
         // io.emit("receiveMessage", data);
+        const senderId = socket.userId;
         io.to(conversationId).emit("receive_message", {
             senderId,
+            username: socket.username,
             text,
             createdAt: new Date()
         });
     });
 
-
     socket.on("disconnect", () => {
-        console.log("🔴 User disconnected:", socket.id);
+        console.log(`🔴 ${username} got disconnected from socket id: ${socket.id}`);
     });    
 });
 
