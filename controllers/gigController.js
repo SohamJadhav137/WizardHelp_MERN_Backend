@@ -1,6 +1,11 @@
+import { validationResult } from "express-validator";
 import Gig from "../models/Gig.js";
 
 export const createGig = async (req, res) => {
+    const errors = validationResult();
+    if(!errors.isEmpty())
+        return res.status(400).json({ message: errors.array()[0].msg })
+    
     try {
         if (req.user.role !== "seller"){
             return res.status(403).json({ message: "Only sellers can create gigs!"});
