@@ -2,7 +2,8 @@ import { validationResult } from "express-validator";
 import Gig from "../models/Gig.js";
 
 export const createGig = async (req, res) => {
-    const errors = validationResult();
+    const errors = validationResult(req);
+    console.log(errors);
     if(!errors.isEmpty())
         return res.status(400).json({ message: errors.array()[0].msg })
     

@@ -14,7 +14,7 @@ router.delete('/:id', protect, deleteGig);
 router.post('/', [
     body("title").notEmpty().withMessage("Title is required!"),
     body("category").notEmpty().withMessage("Category is required!"),
-    body("desc").notEmpty().withMessage("Description is required!"),
+    body("description").notEmpty().withMessage("Description is required!"),
     body("imageURLs").isArray({ min: 1 }).withMessage("Atleast one image is required!"),
     body("price").isNumeric({ gt: 0}).withMessage("Price must be positive!"),
     body("deliveryDays").isNumeric({ gt: 0}).withMessage("Delivery days must be positive!"),
