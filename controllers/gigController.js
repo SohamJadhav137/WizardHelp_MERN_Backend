@@ -3,7 +3,7 @@ import Gig from "../models/Gig.js";
 
 export const createGig = async (req, res) => {
     const errors = validationResult(req);
-    console.log(errors);
+    console.log("Backend validation:\n",errors);
     if(!errors.isEmpty())
         return res.status(400).json({ message: errors.array()[0].msg })
     
@@ -11,11 +11,18 @@ export const createGig = async (req, res) => {
         if (req.user.role !== "seller"){
             return res.status(403).json({ message: "Only sellers can create gigs!"});
         }
+
+        const { imageURLs } = req.body;
+
+        const coverImageURL = imageURLs ? imageURLs[0] : "";
         
         const newGig = new Gig({
             userId: req.user._id,
+            coverImageURL: coverImageURL,
             ...req.body
         });
+
+        console.log(newGig)
         
         const savedGig = await newGig.save();
 

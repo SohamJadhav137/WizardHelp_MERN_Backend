@@ -7,7 +7,7 @@ const gigSchema = new mongoose.Schema(
         description: { type: String, required: true },
         category: { type: String, required: true },
         coverImageURL: { type: String, default: "" },
-        imagesURLs: { type: [String], default: [] },
+        imageURLs: { type: [String], default: [] },
         videoURL: { type: String, default: null},
         docURLs: { type: [String], default: []},
         tags: { type: [String], default: []},
