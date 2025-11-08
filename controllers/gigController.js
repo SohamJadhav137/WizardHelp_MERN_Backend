@@ -52,6 +52,18 @@ export const getSingleGig = async (req, res) => {
     }
 };
 
+export const getUserGigs = async (req, res) => {
+    const userDetails = JSON.parse(localStorage.getItem("user"));
+    const userEmail = userDetails.email;
+    try{
+        const userGigs = await Gig.find({ userEmail });
+        res.status(200).json(userGigs);
+    } catch (error) {
+        console.error("CUSTOM ERROR:",error);
+        res.status(500).json({ message: "Failed to retrieve user specific gigs!"});
+    }
+}
+
 export const deleteGig = async (req, res) => {
     try {
         const gig = await Gig.findById(req.params.id);

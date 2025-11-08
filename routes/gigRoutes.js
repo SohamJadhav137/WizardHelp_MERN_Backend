@@ -1,5 +1,5 @@
 import express from "express";
-import { getGigs, getSingleGig, deleteGig, createGig, updateGig } from "../controllers/gigController.js";
+import { getGigs, getSingleGig, getUserGigs, deleteGig, createGig, updateGig } from "../controllers/gigController.js";
 import { protect } from "../middlewares/authMiddleware.js";
 import { body } from "express-validator";
 
@@ -8,6 +8,8 @@ const router = express.Router();
 router.get('/allgigs', getGigs);
 
 router.get('/:id', getSingleGig);
+
+router.get('/my-gigs', protect, getUserGigs);
 
 router.delete('/:id', protect, deleteGig);
 
