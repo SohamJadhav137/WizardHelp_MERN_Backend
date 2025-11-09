@@ -7,9 +7,9 @@ const router = express.Router();
 
 router.get('/allgigs', getGigs);
 
-router.get('/:id', getSingleGig);
-
 router.get('/my-gigs', protect, getUserGigs);
+
+router.get('/:id', getSingleGig);
 
 router.delete('/:id', protect, deleteGig);
 

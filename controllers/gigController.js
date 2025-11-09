@@ -53,10 +53,9 @@ export const getSingleGig = async (req, res) => {
 };
 
 export const getUserGigs = async (req, res) => {
-    const userDetails = JSON.parse(localStorage.getItem("user"));
-    const userEmail = userDetails.email;
+    const userId = req.user._id;
     try{
-        const userGigs = await Gig.find({ userEmail });
+        const userGigs = await Gig.find({ userId });
         res.status(200).json(userGigs);
     } catch (error) {
         console.error("CUSTOM ERROR:",error);

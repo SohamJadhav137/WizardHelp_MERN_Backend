@@ -15,7 +15,9 @@ const gigSchema = new mongoose.Schema(
         revisions: { type: Number, required: true},
         deliveryDays: { type: Number, required: true},
         starRating: { type: Number, default: 0 },
-        totalreviews: { type: Number, default: 0 }
+        totalreviews: { type: Number, default: 0 },
+        status: { type: String, default: "Published" },
+        orders: { type: Number, default: 0 }
     },
     { timestamps: true }
 );
