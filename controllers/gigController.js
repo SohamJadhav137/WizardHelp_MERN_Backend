@@ -1,5 +1,6 @@
 import { validationResult } from "express-validator";
 import Gig from "../models/Gig.js";
+import { deleteFilesFromS3 } from "../utils/deleteFileFromS3.js";
 
 export const createGig = async (req, res) => {
     const errors = validationResult(req);
@@ -66,14 +67,22 @@ export const getUserGigs = async (req, res) => {
 export const deleteGig = async (req, res) => {
     try {
         const gig = await Gig.findById(req.params.id);
+        if(!gig) return res.status(404).json({ message: "Gig not found!" });
+
+        const allFiles = [
+            ...(gig.imageURLs || []),
+            ...(gig.videoURL || []),
+            ...(gig.docURLs || [])
+        ];
+        
         if(req.user._id.toString() !== gig.userId.toString())
             return res.status(403).json({ message: "Only gig owner can delete the gig!"});
-
-        if(!gig) return res.status(404).json({ message: "Gig not found!"});
+        
+        await deleteFilesFromS3(allFiles);
 
         await Gig.findByIdAndDelete(req.params.id);
 
-        res.status(200).json({ message: "Gig deleted successfully"});
+        res.status(200).json({ message: "Gig and its files deleted successfully"});
     } catch (error) {
         console.error("CUSTOM ERROR:",error);
         res.status(500).json({ message: "Failed to delete the gig!"});
@@ -83,19 +92,20 @@ export const deleteGig = async (req, res) => {
 export const updateGig = async (req, res) => {
     try {
         const gig = await Gig.findById(req.params.id);
+        if(!gig) return res.status(404).json({ message: "Gig not found!"});
+
         if(req.user._id.toString() !== gig.userId.toString())
             return res.status(403).json({ message: "Only gig owner can update the gig!"});
-
-        if(!gig) return res.status(404).json({ message: "Gig not found!"});
 
         const updatedGig = await Gig.findByIdAndUpdate(
             req.params.id,
             { $set: req.body },
-            { new: true}
+            { new: true, runValidators: true}
         );
 
         res.status(200).json(updatedGig);
     } catch (error) {
+        console.error("CUSTOM ERROR:",error);
         res.status(500).json({ message: "Failed to update the gig!"});
     }
 };
