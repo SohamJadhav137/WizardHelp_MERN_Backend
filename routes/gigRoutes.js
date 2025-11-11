@@ -1,5 +1,5 @@
 import express from "express";
-import { getGigs, getSingleGig, getUserGigs, deleteGig, createGig, updateGig } from "../controllers/gigController.js";
+import { getGigs, getSingleGig, getUserGigs, deleteGig, createGig, updateGig, updateGigState } from "../controllers/gigController.js";
 import { protect } from "../middlewares/authMiddleware.js";
 import { body } from "express-validator";
 
@@ -24,5 +24,7 @@ router.post('/', [
 ], protect, createGig);
 
 router.put('/:id', protect, updateGig);
+
+router.patch('/publish-state/:id', protect, updateGigState);
 
 export default router;

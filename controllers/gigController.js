@@ -109,3 +109,29 @@ export const updateGig = async (req, res) => {
         res.status(500).json({ message: "Failed to update the gig!"});
     }
 };
+
+export const updateGigState = async (req, res) => {
+    const gigId = req.params.id;
+    const { isPublished } = req.body;
+
+    try {
+        const gig = await Gig.findById(gigId);
+
+        if(!gig)
+            return res.status(404).json({ message: "Gig was not found!"});
+
+        if(req.user._id.toString() !== gig.userId.toString())
+            return res.status(403).json({ message: "Not authorized to change someone's else gig state!"});
+
+        const updatedGig = await Gig.findByIdAndUpdate(
+            gigId,
+            { $set: { isPublished: isPublished }},
+            { new: true }
+        );
+
+        res.status(200).json(updateGig);
+    } catch (error) {
+        console.error("CUSTOM ERROR:",error);
+        res.status(500).json({ message: "Some BACKEND error occured while updating gig's state!"});
+    }
+}
