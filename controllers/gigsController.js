@@ -49,6 +49,7 @@ export const getSingleGig = async (req, res) => {
         if(!gig) return res.status(404).json({ message: "Gig not found!"});
         res.status(200).json(gig);
     } catch (error) {
+        console.error("CUSTOM ERROR:", error);
         res.status(500).json({ message: "Failed to retreive the gig!"});
     }
 };
@@ -134,4 +135,4 @@ export const updateGigState = async (req, res) => {
         console.error("CUSTOM ERROR:",error);
         res.status(500).json({ message: "Some BACKEND error occured while updating gig's state!"});
     }
-}
+};

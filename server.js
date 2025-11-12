@@ -6,13 +6,14 @@ import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import { authorizeRoles, protect } from "./middlewares/authMiddleware.js";
-import gigRoutes from "./routes/gigRoutes.js";
+import gigsRoutes from "./routes/gigsRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import conversationRoutes from "./routes/conversationRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
 import http from "http";
 import { Server } from "socket.io";
 import uploadRoutes from "./routes/uploadRoutes.js";
+import catRoutes from './routes/catRoutes.js';
 
 // It loads .env variables into process.env
 
@@ -82,11 +83,12 @@ io.on("connection", (socket) => {
     // });
         
 app.use('/api/auth', authRoutes);
-app.use('/api/gigs', gigRoutes);
+app.use('/api/gigs', gigsRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/conversations', conversationRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/category', catRoutes);
 
 const PORT = process.env.PORT || 5000;
 

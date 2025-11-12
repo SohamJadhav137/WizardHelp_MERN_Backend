@@ -3,9 +3,22 @@ import mongoose from "mongoose";
 const gigSchema = new mongoose.Schema(
     {
         userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+        username: { type: String, required: true },
         title: { type: String, required: true, trim: true },
         description: { type: String, required: true },
-        category: { type: String, required: true },
+        category: {
+            type: String,
+            enum: [
+                "Software Development",
+                "Video Editing",
+                "Writing & Translation",
+                "Finance",
+                "Digital Marketing",
+                "Data Analytics",
+                "Music & Audio",
+            ],
+            required: true 
+        },
         coverImageURL: { type: String, default: "" },
         imageURLs: { type: [String], default: [] },
         videoURL: { type: String, default: null},
@@ -15,7 +28,7 @@ const gigSchema = new mongoose.Schema(
         revisions: { type: Number, required: true},
         deliveryDays: { type: Number, required: true},
         starRating: { type: Number, default: 0 },
-        totalreviews: { type: Number, default: 0 },
+        totalReviews: { type: Number, default: 0 },
         isPublished: { type: Boolean, default: false },
         orders: { type: Number, default: 0 }
     },

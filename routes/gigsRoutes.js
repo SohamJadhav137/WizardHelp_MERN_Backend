@@ -1,5 +1,5 @@
 import express from "express";
-import { getGigs, getSingleGig, getUserGigs, deleteGig, createGig, updateGig, updateGigState } from "../controllers/gigController.js";
+import { getGigs, getSingleGig, getUserGigs, deleteGig, createGig, updateGig, updateGigState } from "../controllers/gigsController.js";
 import { protect } from "../middlewares/authMiddleware.js";
 import { body } from "express-validator";
 
