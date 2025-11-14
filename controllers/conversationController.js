@@ -2,14 +2,14 @@ import Conversation from "../models/conversation.js";
 
 export const createConversation = async (req, res) => {
     try {
-        const { sellerId, buyerId } = req.body;
+        const { sellerId, sellerName, buyerId, buyerName } = req.body;
         
-        const existing = await Conversation.findOne({ sellerId, buyerId});
+        const existing = await Conversation.findOne({ sellerId, buyerId });
         
         if(existing)
             res.status(200).json(existing);
         
-        const conversation = new Conversation({ sellerId, buyerId });
+        const conversation = new Conversation({ sellerId, sellerName, buyerId, buyerName });
         const saved = await conversation.save();
         
         res.status(201).json(saved);
@@ -26,7 +26,7 @@ export const getConversations = async (req, res) => {
             { sellerId: req.user._id } : { buyerId: req.user._id };
 
         const conversations = await Conversation.find(filter)
-            .sort({ updatedAt: -1})
+            .sort({ updatedAt: -1 })
             .populate("sellerId buyerId", "username email");
         
         res.status(200).json(conversations);

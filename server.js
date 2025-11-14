@@ -14,6 +14,8 @@ import http from "http";
 import { Server } from "socket.io";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import catRoutes from './routes/catRoutes.js';
+import Message from "./models/message.js";
+import Conversation from "./models/conversation.js";
 
 // It loads .env variables into process.env
 
@@ -43,25 +45,58 @@ io.on("connection", (socket) => {
     const { userId, username } = socket.handshake.auth;
     socket.userId = userId;
     socket.username = username;
-    console.log(`🟢 ${username} at socket id connected: ${socket.id}`);
+    console.log(`🟢 ${username} connected at socket id: ${socket.id}`);
 
     socket.on("join_conversation", (conversationId) => {
         socket.join(conversationId);
         console.log(`${username} joined conversation of Id: ${conversationId}`);
     });
 
-    socket.on("send_message", (data) => {
-        const {conversationId, text} = data;
-        // console.log("Received message:",data);
-        // io.emit("receiveMessage", data);
-        const senderId = socket.userId;
-        io.to(conversationId).emit("receive_message", {
-            senderId,
-            username: socket.username,
-            text,
-            createdAt: new Date()
-        });
+    socket.on("send_message", async (messageData) => {
+        console.log(messageData)
+
+        try {
+            const newMessage = new Message({
+                conversationId: messageData.conversationId,
+                senderId: messageData.senderId,
+                text: messageData.text
+            });
+
+            const savedMessage = await newMessage.save();
+
+            await Conversation.findByIdAndUpdate(
+                messageData.conversationId,
+                {
+                    lastMessage: messageData.text,
+                    updatedAt: Date.now()
+                },
+                { new: true }
+            );
+
+            // const dummyMessage = {
+            //     conversationId: messageData.conversationId,
+            //     senderId: messageData.senderId,
+            //     text: messageData.text,
+            // }
+            
+            const broadcastMessage = {
+                ...savedMessage.toObject(),
+                username: messageData.currentUser
+            };
+
+            io.to(messageData.conversationId).emit("receive_message", broadcastMessage);
+        } catch(error) {
+            console.error("CUSTOM ERROR:", error);
+            socket.emit('messageError', { text: 'Failed to send message!' });
+        }
     });
+
+    socket.on("leave_conversation", (conversationId) => {
+        if(socket.rooms.has(conversationId)) {
+            socket.leave(conversationId);
+            console.log(`${socket.username} left conversation room Id: ${conversationId}`);
+        }
+    })
 
     socket.on("disconnect", () => {
         console.log(`🔴 ${username} got disconnected from socket id: ${socket.id}`);

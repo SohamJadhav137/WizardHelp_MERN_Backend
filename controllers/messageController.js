@@ -42,6 +42,7 @@ export const sendMessage = async (req, res) => {
 export const getMessages = async (req, res) => {
     try{
         const conversationId = req.params.id;
+        console.log("Conversation ID:", conversationId);
         if(!conversationId) return res.status(400).json({ message: "CoversationId required!"});
 
         const messages = await Message.find({ conversationId }).sort({ createdAt: 1 });

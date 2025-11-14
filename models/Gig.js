@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const gigSchema = new mongoose.Schema(
     {
         userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-        username: { type: String, required: true },
+        sellerName: { type: String, required: true },
         title: { type: String, required: true, trim: true },
         description: { type: String, required: true },
         category: {
