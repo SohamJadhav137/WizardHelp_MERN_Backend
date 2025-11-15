@@ -6,8 +6,8 @@ const orderSchema = new mongoose.Schema(
         sellerId: { type: mongoose.Types.ObjectId, ref: "User", required: true },
         buyerId: { type: mongoose.Types.ObjectId, ref: "User", required: true },
         price: { type: Number, required: true },
-        paymentIntent: { type: String },
-        isCompleted: { type: Boolean, default: false }
+        status: { type: String, enum: ["active", "delivered", "completed", "cancelled"], default: "active"},
+        deliveryFiles: { type: String }
     },
     { timestamps: true }
 );

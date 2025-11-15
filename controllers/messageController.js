@@ -40,13 +40,11 @@ export const sendMessage = async (req, res) => {
 };
 
 export const getMessages = async (req, res) => {
-    try{
-        const conversationId = req.params.id;
-        console.log("Conversation ID:", conversationId);
-        if(!conversationId) return res.status(400).json({ message: "CoversationId required!"});
+    const conversationId = req.params.id;
+    if(!conversationId) return res.status(400).json({ message: "CoversationId required!"});
 
-        const messages = await Message.find({ conversationId }).sort({ createdAt: 1 });
-        
+    try {
+        const messages = await Message.find({ conversationId }).populate('senderId', 'username').sort({ createdAt: 1 });        
         return res.status(200).json(messages);
     } catch(error) {
         console.error("CUSTOM ERROR:",error);

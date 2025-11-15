@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
+// It loads .env variables into process.env
 dotenv.config();
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -17,11 +18,11 @@ import catRoutes from './routes/catRoutes.js';
 import Message from "./models/message.js";
 import Conversation from "./models/conversation.js";
 
-// It loads .env variables into process.env
-
 const app = express();
 
 app.use(cors({origin: "http://localhost:5173", methods: ["GET", "POST", "DELETE", "PUT", "PATCH"], credentials: true}));
+// cors: cross origin resource sharing
+// credentials: It allows requests to include credentials like cookies, authorization headers, JWT in cookies etc. 
 
 ////////////// Socket.io setup ///////////////////////
 
@@ -72,16 +73,13 @@ io.on("connection", (socket) => {
                 },
                 { new: true }
             );
-
-            // const dummyMessage = {
-            //     conversationId: messageData.conversationId,
-            //     senderId: messageData.senderId,
-            //     text: messageData.text,
-            // }
             
             const broadcastMessage = {
                 ...savedMessage.toObject(),
-                username: messageData.currentUser
+                senderId: {
+                    _id: socket.userId,
+                    username: socket.username
+                }
             };
 
             io.to(messageData.conversationId).emit("receive_message", broadcastMessage);
