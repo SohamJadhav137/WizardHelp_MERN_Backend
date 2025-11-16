@@ -4,7 +4,7 @@ const s3Client = new S3Client({
     region: process.env.AWS_REGION
 });
 
-export const deleteFilesFromS3 = async (fileURLs) => {
+export const deleteAllFilesFromS3 = async (fileURLs) => {
     if(!fileURLs) return;
 
     const ObjectsToDelete = fileURLs.map(url => {

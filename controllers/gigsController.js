@@ -1,6 +1,6 @@
 import { validationResult } from "express-validator";
 import Gig from "../models/Gig.js";
-import { deleteFilesFromS3 } from "../utils/deleteFileFromS3.js";
+import { deleteAllFilesFromS3 } from "../utils/deleteAllFilesFromS3.js";
 
 export const createGig = async (req, res) => {
     const errors = validationResult(req);
@@ -87,7 +87,7 @@ export const deleteGig = async (req, res) => {
         if(req.user._id.toString() !== gig.userId.toString())
             return res.status(403).json({ message: "Only gig owner can delete the gig!"});
         
-        await deleteFilesFromS3(allFiles);
+        await deleteAllFilesFromS3(allFiles);
 
         await Gig.findByIdAndDelete(req.params.id);
 
