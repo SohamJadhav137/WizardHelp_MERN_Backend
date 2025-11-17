@@ -62,8 +62,8 @@ export const getSingleGig = async (req, res) => {
     }
 };
 
-export const getUserGigs = async (req, res) => {
-    const userId = req.user._id;
+export const getSellerGigs = async (req, res) => {
+    const userId = req.user.id;
     try{
         const userGigs = await Gig.find({ userId });
         res.status(200).json(userGigs);

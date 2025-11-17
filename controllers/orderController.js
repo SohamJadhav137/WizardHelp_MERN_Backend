@@ -5,8 +5,7 @@ export const createOrder = async (req, res) => {
     try{
         const gig = await Gig.findById(req.params.gigId);
         if(!gig) res.status(404).json({ message: "Gig not found!"});
-        
-        if(req.user._id.toString() === gig.userId.toString())
+        if(req.user.id.toString() === gig.userId.toString())
             return res.status(403).json({ message: "You cannot buy your own gig!"});
         
         const newOrder = new Order ({
@@ -57,3 +56,18 @@ export const markAsComplete = async (req, res) => {
         res.status(500).json({ message: "Failed to mark order as complete!" });
     }
 };
+
+export const getSingleOrder = async (req, res) => {
+    try{
+        let filter = {};
+        
+        if(req.user.role === "seller") filter.sellerId = req.user._id;
+        else filter.buyerId = req.user._id;
+        
+        const orders = await Order.findById(filter);
+        res.status(200).json(orders);
+    } catch (error) {
+        console.error("CUSTOM ERROR:",error);
+        res.status(500).json({ message: "Failed to fetch orders!"});
+    }
+}

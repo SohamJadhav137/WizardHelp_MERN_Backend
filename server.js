@@ -18,6 +18,7 @@ import catRoutes from './routes/catRoutes.js';
 import Message from "./models/message.js";
 import Conversation from "./models/conversation.js";
 import deleteRoute from "./routes/deleteFileRoute.js";
+import userRoutes from "./routes/userRoutes.js";
 
 const app = express();
 
@@ -124,6 +125,7 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/category', catRoutes);
 app.use('/api/s3', deleteRoute);
+app.use('/api/user', userRoutes);
 
 const PORT = process.env.PORT || 5000;
 

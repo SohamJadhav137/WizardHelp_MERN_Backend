@@ -1,13 +1,13 @@
 import express from "express";
-import { getGigs, getSingleGig, getUserGigs, deleteGig, createGig, updateGig, updateGigState } from "../controllers/gigsController.js";
-import { protect } from "../middlewares/authMiddleware.js";
+import { getGigs, getSingleGig, getSellerGigs, deleteGig, createGig, updateGig, updateGigState } from "../controllers/gigsController.js";
+import { authorizeRoles, protect } from "../middlewares/authMiddleware.js";
 import { body } from "express-validator";
 
 const router = express.Router();
 
 router.get('/allgigs', getGigs);
 
-router.get('/my-gigs', protect, getUserGigs);
+router.get('/my-gigs', protect, authorizeRoles("seller"), getSellerGigs);
 
 router.get('/:id', getSingleGig);
 
