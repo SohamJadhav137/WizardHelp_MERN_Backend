@@ -12,12 +12,12 @@ export const createOrder = async (req, res) => {
             gigId: gig._id,
             buyerId: req.user._id,
             sellerId: gig.userId,
-            price: gig.price,
-            paymentIntent: "mock_payment_" + Date.now()
+            price: gig.price
         });
         
         const savedOrder = await newOrder.save();
-        res.status(201).json(savedOrder);
+        // res.status(201).json(savedOrder);
+        res.status(201).json({ message: "Order placed successfully!" });
     } catch (error) {
         console.error("CUSTOM ERROR:",error);
         res.status(500).json({ message: "Failed to create the order!"});
@@ -59,13 +59,12 @@ export const markAsComplete = async (req, res) => {
 
 export const getSingleOrder = async (req, res) => {
     try{
-        let filter = {};
+        const order = await Order.findById(req.params.id);
         
-        if(req.user.role === "seller") filter.sellerId = req.user._id;
-        else filter.buyerId = req.user._id;
-        
-        const orders = await Order.findById(filter);
-        res.status(200).json(orders);
+        if(!order)
+            res.status(400).json({ message: "Order not found!"});
+
+        res.status(200).json(order);
     } catch (error) {
         console.error("CUSTOM ERROR:",error);
         res.status(500).json({ message: "Failed to fetch orders!"});

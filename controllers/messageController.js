@@ -41,7 +41,8 @@ export const sendMessage = async (req, res) => {
 
 export const getMessages = async (req, res) => {
     const conversationId = req.params.id;
-    if(!conversationId) return res.status(400).json({ message: "CoversationId required!"});
+    if(!conversationId || conversationId === 'undefined') 
+        return res.status(400).json({ message: "CoversationId required!"});
 
     try {
         const messages = await Message.find({ conversationId }).populate('senderId', 'username').sort({ createdAt: 1 });        
