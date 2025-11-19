@@ -39,21 +39,27 @@ export const getOrders = async (req, res) => {
     }
 };
 
-export const markAsComplete = async (req, res) => {
+export const markAsDelivered = async (req, res) => {
     try{
+        const { deliveryFiles, sellerNote } = req.body;
+        if(!deliveryFiles){
+            return res.status(400).json({ error: 'No files are attached' });
+        }
         const order = await Order.findById(req.params.id);
         if(!order) return res.status(404).json({ message: "Order not found!" });
         
         if(req.user._id.toString() !== order.sellerId.toString())
-            return res.status(403).json({ message: "Only seller can mark order as complete!" });
+            return res.status(403).json({ message: "Only seller can mark order as delivered!" });
         
-        order.isCompleted = true;
+        order.status = "delivered";
+        order.deliveryFiles = deliveryFiles;
+        order.sellerNote = sellerNote;
         await order.save();
         
-        res.status(200).json({ message: "Order marked as complete" });
+        res.status(200).json({ message: "Order status marked as delivered" });
     } catch (error) {
         console.error("CUSTOM ERROR:",error);
-        res.status(500).json({ message: "Failed to mark order as complete!" });
+        res.status(500).json({ message: "Failed to mark order as delivered!" });
     }
 };
 
