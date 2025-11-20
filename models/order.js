@@ -7,7 +7,14 @@ const orderSchema = new mongoose.Schema(
         buyerId: { type: mongoose.Types.ObjectId, ref: "User", required: true },
         price: { type: Number, required: true },
         status: { type: String, enum: ["active", "delivered", "completed", "cancelled"], default: "active"},
-        deliveryFiles: { type: [String], default: []},
+        deliveryFiles: { type: [
+            {
+                url: { type: String, required: true},
+                fileName: { type: String, required: true},
+                fileType: { type: String, required: true},
+                fileSize: { type: Number, required: true},
+            }
+        ], default: []},
         sellerNote: { type: String, default: "" },
         buyerNote: { type: String, default: "" }
     },

@@ -1,5 +1,6 @@
 import Gig from "../models/Gig.js";
 import Order from "../models/order.js";
+import { getIO } from "../socket-io/socket-io.js";
 
 export const createOrder = async (req, res) => {
     try{
@@ -41,8 +42,12 @@ export const getOrders = async (req, res) => {
 
 export const markAsDelivered = async (req, res) => {
     try{
+        const io = getIO();
         const { deliveryFiles, sellerNote } = req.body;
-        if(!deliveryFiles){
+        // console.log("Delivery Files:\n", deliveryFiles);
+        // console.log("Seller Note:\n", sellerNote);
+        // console.log("Files length:", deliveryFiles.length);
+        if(!Array.isArray(deliveryFiles) || deliveryFiles.length === 0){
             return res.status(400).json({ error: 'No files are attached' });
         }
         const order = await Order.findById(req.params.id);
@@ -52,11 +57,25 @@ export const markAsDelivered = async (req, res) => {
             return res.status(403).json({ message: "Only seller can mark order as delivered!" });
         
         order.status = "delivered";
-        order.deliveryFiles = deliveryFiles;
+        order.deliveryFiles = deliveryFiles.map(file => ({
+            url: file.url,
+            fileName: file.name,
+            fileType: file.type,
+            fileSize: file.size
+        }));
+
         order.sellerNote = sellerNote;
+
         await order.save();
+        // console.log(order);
+
+        console.log("Buyer ID:", order.buyerId.toString());
+
+        io.to(order.buyerId.toString()).emit("orderDelivered", {
+           updatedOrder: order
+        });
         
-        res.status(200).json({ message: "Order status marked as delivered" });
+        res.status(200).json({ message: "Order status marked as delivered", updatedAt: order.updatedAt });
     } catch (error) {
         console.error("CUSTOM ERROR:",error);
         res.status(500).json({ message: "Failed to mark order as delivered!" });

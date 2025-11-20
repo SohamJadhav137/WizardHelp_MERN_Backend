@@ -11,14 +11,15 @@ import gigsRoutes from "./routes/gigsRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import conversationRoutes from "./routes/conversationRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
+
 import http from "http";
-import { Server } from "socket.io";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import catRoutes from './routes/catRoutes.js';
 import Message from "./models/message.js";
 import Conversation from "./models/conversation.js";
 import deleteRoute from "./routes/deleteFileRoute.js";
 import userRoutes from "./routes/userRoutes.js";
+import { initSocket } from "./socket-io/socket-io.js";
 
 const app = express();
 
@@ -26,82 +27,14 @@ app.use(cors({origin: "http://localhost:5173", methods: ["GET", "POST", "DELETE"
 // cors: cross origin resource sharing
 // credentials: It allows requests to include credentials like cookies, authorization headers, JWT in cookies etc. 
 
-////////////// Socket.io setup ///////////////////////
-
 const server = http.createServer(app);
 
 // Linking socket.io with http server
-const io = new Server(server, {
-    cors : {
-        origin: "http://localhost:5173",
-        methods: ["GET", "POST"],
-        credentials: true
-    }
-});
+initSocket(server);
 
 app.use(express.json());
 
 connectDB();
-
-// Things to perform after client connects with the server
-io.on("connection", (socket) => {
-    const { userId, username } = socket.handshake.auth;
-    socket.userId = userId;
-    socket.username = username;
-    console.log(`🟢 ${username} connected at socket id: ${socket.id}`);
-
-    socket.on("join_conversation", (conversationId) => {
-        socket.join(conversationId);
-        console.log(`${username} joined conversation of Id: ${conversationId}`);
-    });
-
-    socket.on("send_message", async (messageData) => {
-        console.log(messageData)
-
-        try {
-            const newMessage = new Message({
-                conversationId: messageData.conversationId,
-                senderId: messageData.senderId,
-                text: messageData.text
-            });
-
-            const savedMessage = await newMessage.save();
-
-            await Conversation.findByIdAndUpdate(
-                messageData.conversationId,
-                {
-                    lastMessage: messageData.text,
-                    updatedAt: Date.now()
-                },
-                { new: true }
-            );
-            
-            const broadcastMessage = {
-                ...savedMessage.toObject(),
-                senderId: {
-                    _id: socket.userId,
-                    username: socket.username
-                }
-            };
-
-            io.to(messageData.conversationId).emit("receive_message", broadcastMessage);
-        } catch(error) {
-            console.error("CUSTOM ERROR:", error);
-            socket.emit('messageError', { text: 'Failed to send message!' });
-        }
-    });
-
-    socket.on("leave_conversation", (conversationId) => {
-        if(socket.rooms.has(conversationId)) {
-            socket.leave(conversationId);
-            console.log(`${socket.username} left conversation room Id: ${conversationId}`);
-        }
-    })
-
-    socket.on("disconnect", () => {
-        console.log(`🔴 ${username} got disconnected from socket id: ${socket.id}`);
-    });    
-});
 
 // It allows frontend at port 5173 to communicate with this server
 // app.use(cors()); // Temporarily allow all originss
