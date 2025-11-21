@@ -6,7 +6,7 @@ const orderSchema = new mongoose.Schema(
         sellerId: { type: mongoose.Types.ObjectId, ref: "User", required: true },
         buyerId: { type: mongoose.Types.ObjectId, ref: "User", required: true },
         price: { type: Number, required: true },
-        status: { type: String, enum: ["active", "delivered", "completed", "cancelled"], default: "active"},
+        status: { type: String, enum: ["active", "delivered", "completed", "revised", "cancelled"], default: "active"},
         deliveryFiles: { type: [
             {
                 url: { type: String, required: true},
@@ -16,7 +16,9 @@ const orderSchema = new mongoose.Schema(
             }
         ], default: []},
         sellerNote: { type: String, default: "" },
-        buyerNote: { type: String, default: "" }
+        buyerNote: { type: String, default: "" },
+        deliveredAt: { type: Date, default: null },
+        completedAt: { type: Date, default: null }
     },
     { timestamps: true }
 );

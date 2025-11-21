@@ -52,8 +52,11 @@ export const markAsDelivered = async (req, res) => {
         }
         const order = await Order.findById(req.params.id);
         if(!order) return res.status(404).json({ message: "Order not found!" });
+
+        // console.log("Requesting userId:", req.user.id);
+        // console.log("Buyer Id:", order.buyerId.toString());
         
-        if(req.user._id.toString() !== order.sellerId.toString())
+        if(req.user._id.toString() === order.buyerId.toString())
             return res.status(403).json({ message: "Only seller can mark order as delivered!" });
         
         order.status = "delivered";
@@ -65,6 +68,7 @@ export const markAsDelivered = async (req, res) => {
         }));
 
         order.sellerNote = sellerNote;
+        order.deliveredAt = new Date();
 
         await order.save();
         // console.log(order);
@@ -81,6 +85,50 @@ export const markAsDelivered = async (req, res) => {
         res.status(500).json({ message: "Failed to mark order as delivered!" });
     }
 };
+
+export const markAsCompleted = async (req, res) => {
+    const { buyerNote } = req.body;
+    const io = getIO();
+
+    try{
+        const order = await Order.findById(req.params.id);
+        
+        if(!order)
+            return res.status(404).json({ error: "Order not found" });
+
+        console.log("Requesting userId:", req.user.id);
+        console.log("Buyer Id:", order.sellerId.toString());
+        
+        if(req.user.id.toString() === order.sellerId.toString()){
+            return res.status(403).json({ error: "Only buyer can mark order as complete" })
+        }
+        
+        order.status = "completed";
+        order.buyerNote = buyerNote;
+        order.completedAt = new Date();
+
+        await order.save();
+
+        await Gig.findByIdAndUpdate(order.gigId, {
+            $inc: { orders: 1 }
+        });
+
+        io.to(order.sellerId.toString()).emit("orderCompleted", {
+            updatedOrder: order
+        });
+
+        io.to(order.buyerId.toString()).emit("orderCompleted", {
+            updatedOrder: order
+        });
+        
+        res.status(201).json({ message: "Order was successfully completed" });
+
+    } catch(error){
+        console.error("CUSTOM ERROR:", error);
+        return res.status(500).json({ error: "Failed to mark order as completed" });
+    }
+    
+}
 
 export const getSingleOrder = async (req, res) => {
     try{
