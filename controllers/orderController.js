@@ -8,16 +8,21 @@ export const createOrder = async (req, res) => {
         if(!gig) res.status(404).json({ message: "Gig not found!"});
         if(req.user.id.toString() === gig.userId.toString())
             return res.status(403).json({ message: "You cannot buy your own gig!"});
+
+        const initalDeliveryDays = gig.deliveryDays;
+        const dueDate = new Date(Date.now() + initalDeliveryDays * 24 * 60 * 60 * 1000);
         
         const newOrder = new Order ({
             gigId: gig._id,
             buyerId: req.user._id,
             sellerId: gig.userId,
-            price: gig.price
-        });
+            price: gig.price,
+            dueDate: dueDate,
+            totalRevisions: gig.revisions
+        });        
         
-        const savedOrder = await newOrder.save();
-        // res.status(201).json(savedOrder);
+        await newOrder.save();
+
         res.status(201).json({ message: "Order placed successfully!" });
     } catch (error) {
         console.error("CUSTOM ERROR:",error);
@@ -41,8 +46,8 @@ export const getOrders = async (req, res) => {
 };
 
 export const markAsDelivered = async (req, res) => {
+    const io = getIO();
     try{
-        const io = getIO();
         const { deliveryFiles, sellerNote } = req.body;
         // console.log("Delivery Files:\n", deliveryFiles);
         // console.log("Seller Note:\n", sellerNote);
@@ -71,9 +76,6 @@ export const markAsDelivered = async (req, res) => {
         order.deliveredAt = new Date();
 
         await order.save();
-        // console.log(order);
-
-        console.log("Buyer ID:", order.buyerId.toString());
 
         io.to(order.buyerId.toString()).emit("orderDelivered", {
            updatedOrder: order
@@ -95,9 +97,6 @@ export const markAsCompleted = async (req, res) => {
         
         if(!order)
             return res.status(404).json({ error: "Order not found" });
-
-        console.log("Requesting userId:", req.user.id);
-        console.log("Buyer Id:", order.sellerId.toString());
         
         if(req.user.id.toString() === order.sellerId.toString()){
             return res.status(403).json({ error: "Only buyer can mark order as complete" })
@@ -141,5 +140,41 @@ export const getSingleOrder = async (req, res) => {
     } catch (error) {
         console.error("CUSTOM ERROR:",error);
         res.status(500).json({ message: "Failed to fetch orders!"});
+    }
+}
+
+export const requestRevision = async (req, res) => {
+    const { buyerNote } = req.body;
+    const io = getIO();
+
+    try{
+        const order = await Order.findById(req.params.id);
+
+        if(!order)
+            return res.status(404).json({ error: "Order not found" });
+
+        if(req.user.id.toString() !== order.buyerId.toString())
+            return res.status(403).json({ error: "Only buyer can request for revision" });
+
+        order.status = "revision";
+        order.buyerNote = buyerNote;
+
+        if(order.revisionCount === order.totalRevisions){
+            return res.status(400).json({ message: "Revision limit reached!" });
+        }
+        else{
+            order.revisionCount += 1;
+        }
+
+        io.to(order.sellerId.toString()).emit("orderRevision", {
+            updatedOrder: order
+        });
+        
+        await order.save();
+        
+        res.json(201).json({ message: "Revision request is sent to seller" });
+    } catch(error){
+        console.error("CUSTOM ERROR:", error);
+        res.status(500).json({ error: "Backend error occured while sending revision request"});
     }
 }
