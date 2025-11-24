@@ -18,11 +18,11 @@ export const initSocket = (server) => {
         const { userId, username } = socket.handshake.auth;
         socket.userId = userId;
         socket.username = username;
-        console.log(`🟢 ${username} connected at socket id: ${socket.id}`);
+        console.log(`🟢 Backend connected at socket id: ${socket.id}`);
 
         socket.on("joinRoom", (userId) => {
             socket.join(userId);
-            console.log(`User ${userId} joined room`);
+            console.log(`User ${socket.username} joined room`);
         });
 
         socket.on("join_conversation", (conversationId) => {

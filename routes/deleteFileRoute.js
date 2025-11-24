@@ -4,6 +4,6 @@ import { deleteFileController } from "../controllers/deleteFileController.js";
 
 const router = express.Router();
 
-router.post('/delete-file', protect, deleteFileController);
+router.delete('/delete-file', protect, deleteFileController);
 
 export default router;
