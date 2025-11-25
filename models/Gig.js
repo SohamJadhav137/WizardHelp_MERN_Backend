@@ -28,6 +28,7 @@ const gigSchema = new mongoose.Schema(
         revisions: { type: Number, required: true},
         deliveryDays: { type: Number, required: true},
         starRating: { type: Number, default: 0 },
+        totalRatingSum: { type: Number, default: 0 },
         totalReviews: { type: Number, default: 0 },
         isPublished: { type: Boolean, default: false },
         orders: { type: Number, default: 0 }

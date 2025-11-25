@@ -27,7 +27,7 @@ export const initSocket = (server) => {
 
         socket.on("join_conversation", (conversationId) => {
             socket.join(conversationId);
-            console.log(`${username} joined conversation of Id: ${conversationId}`);
+            console.log(`💬 ${username} joined conversation of Id: ${conversationId}`);
         });
 
         socket.on("send_message", async (messageData) => {
@@ -69,7 +69,7 @@ export const initSocket = (server) => {
         socket.on("leave_conversation", (conversationId) => {
             if (socket.rooms.has(conversationId)) {
                 socket.leave(conversationId);
-                console.log(`${socket.username} left conversation room Id: ${conversationId}`);
+                console.log(`💬 ❌${socket.username} left conversation room Id: ${conversationId}`);
             }
         })
 

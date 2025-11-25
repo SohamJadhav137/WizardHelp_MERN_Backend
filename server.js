@@ -3,10 +3,8 @@ import dotenv from "dotenv";
 // It loads .env variables into process.env
 dotenv.config();
 import cors from "cors";
-import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
-import { authorizeRoles, protect } from "./middlewares/authMiddleware.js";
 import gigsRoutes from "./routes/gigsRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import conversationRoutes from "./routes/conversationRoutes.js";
@@ -15,11 +13,10 @@ import messageRoutes from "./routes/messageRoutes.js";
 import http from "http";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import catRoutes from './routes/catRoutes.js';
-import Message from "./models/message.js";
-import Conversation from "./models/conversation.js";
 import deleteRoute from "./routes/deleteFileRoute.js";
 import userRoutes from "./routes/userRoutes.js";
 import { initSocket } from "./socket-io/socket-io.js";
+import reviewRoutes from "./routes/reviewRoutes.js";
 
 const app = express();
 
@@ -59,6 +56,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/category', catRoutes);
 app.use('/api/s3', deleteRoute);
 app.use('/api/user', userRoutes);
+app.use('/api/review', reviewRoutes);
 
 const PORT = process.env.PORT || 5000;
 

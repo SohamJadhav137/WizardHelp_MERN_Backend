@@ -24,7 +24,8 @@ const orderSchema = new mongoose.Schema(
         revisionCount: { type: Number, default: 0 },
         cancellationRequestedBy: { type: String, enum: ['buyer', 'seller'], default: null},
         cancellationReason: { type: String },
-        previousStatus: { type: String,  enum: ["active", "delivered", "revision", null], default: null}
+        previousStatus: { type: String,  enum: ["active", "delivered", "revision", null], default: null},
+        isReviewed: { type: Boolean, default: false}
     },
     { timestamps: true }
 );

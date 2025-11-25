@@ -1,17 +1,20 @@
 import Conversation from "../models/conversation.js";
+import User from "../models/user.js";
 
 export const createConversation = async (req, res) => {
     try {
         const { sellerId, sellerName, buyerId, buyerName } = req.body;
 
-        if (existing)
-            res.status(200).json(existing);
-        else {
-            const conversation = new Conversation({ sellerId, sellerName, buyerId, buyerName });
-            const saved = await conversation.save();
-            // res.status(201).json(saved);
-            res.status(201).json({ message: "New conversation added to messages" });
+        const existing = await Conversation.findOne({ sellerId, buyerId });
+        if (existing) {
+            return res.status(200).json(existing);
         }
+
+        const conversation = new Conversation({ sellerId, sellerName, buyerId, buyerName });
+        await conversation.save();
+        // res.status(201).json(saved);
+        res.status(201).json({ message: "New conversation added to messages" });
+
     } catch (error) {
         console.error("CUSTOM ERROR:", error);
         res.status(500).json({ message: "Failed to create conversation!" });
@@ -37,32 +40,41 @@ export const getConversations = async (req, res) => {
 
 export const getSingleConversation = async (req, res) => {
 
-    const senderId = req.user.id;
-    const recipientId = req.params.id;
-    let sellerId;
-    let buyerId;
-    if(req.user.role === 'buyer'){
-        buyerId = senderId;
-        sellerId = recipientId;
-    }
-    else{
-        sellerId = senderId;
-        buyerId = recipientId;
-    }
-
-    console.log("Sender Id: ", senderId);
-    console.log("Recipient Id: ", recipientId);
-
-    if (!senderId && !recipientId)
-        return res.status(400).json({ message: "Either or both ids are missing!" });
-
     try {
-        const conversation = await Conversation.findOne({ buyerId, sellerId });
+        const senderId = req.user.id;
+        const recipientId = req.params.id;
+        let sellerId;
+        let buyerId;
+        if (req.user.role === 'buyer') {
+            buyerId = senderId;
+            sellerId = recipientId;
+        }
+        else {
+            sellerId = senderId;
+            buyerId = recipientId;
+        }
 
-        if(!conversation)
-            return res.status(400).json({ message: "Conversation not found!" });
+        if (!senderId && !recipientId)
+            return res.status(400).json({ message: "Either or both ids are missing!" });
 
-        res.status(200).json(conversation);
+        let conversation = await Conversation.findOne({ buyerId, sellerId });
+
+        if (conversation) {
+            res.status(200).json(conversation);
+        }
+
+        const buyer = await User.findById(buyerId).select("username");
+        const seller = await User.findById(buyerId).select("username");
+
+        conversation = new Conversation({
+            sellerId,
+            buyerId,
+            sellerName: seller.username,
+            buyerName: buyer.username
+        });
+
+        res.status(201).json(conversation);
+
     } catch (error) {
         console.error("CUSTOM ERROR:", error);
         res.status(500).json({ message: "Failed to retrieve single conversation!" });
