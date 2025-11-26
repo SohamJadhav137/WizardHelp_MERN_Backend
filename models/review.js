@@ -5,7 +5,7 @@ const reviewSchema = new mongoose.Schema(
         gigId: { type: mongoose.Schema.Types.ObjectId, ref: "Gig", required: true },
         buyerId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
         orderId: { type: mongoose.Schema.Types.ObjectId, ref: "order", required: true},
-        rating: { type: Number, required: true },
+        rating: { type: Number, required: true, min: 1, max: 5, validate: { validator: Number.isInteger, message: "Rating must be an integer!" }},
         comment: { type: String, required: true },
         price: { type: Number, required: true},   
         duration: { type: Number, required: true},   

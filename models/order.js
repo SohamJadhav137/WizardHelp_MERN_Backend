@@ -25,7 +25,9 @@ const orderSchema = new mongoose.Schema(
         cancellationRequestedBy: { type: String, enum: ['buyer', 'seller'], default: null},
         cancellationReason: { type: String },
         previousStatus: { type: String,  enum: ["active", "delivered", "revision", null], default: null},
-        isReviewed: { type: Boolean, default: false}
+        isReviewed: { type: Boolean, default: false},
+        isBuyerRated: { type: Boolean, default: false},
+        buyerRating: { type: Number, required: true, min: 1, max: 5, validate: { validator: Number.isInteger, message: "Rating must be an integer!" }}
     },
     { timestamps: true }
 );
