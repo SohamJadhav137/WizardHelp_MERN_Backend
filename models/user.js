@@ -9,7 +9,11 @@ const userSchema = new mongoose.Schema(
         role: {type: String, enum:["buyer", "seller"], default: "buyer"},
         ratingSum: { type: Number, default: 0 },
         ratingCount: { type: Number, default: 0},
-        rating: { type: Number, default: 0 }
+        rating: { type: Number, default: 0 },
+        country: { type: String, default: "" },
+        languages: { type: [String], default: [] },
+        skills: { type: [String], default: [] },
+        profilePic: { type: String, default: "" }
     },
     {
         timestamps: true
