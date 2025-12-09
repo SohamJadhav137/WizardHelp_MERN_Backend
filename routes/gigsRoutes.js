@@ -18,12 +18,20 @@ router.post('/', [
     body("category").notEmpty().withMessage("Category is required!"),
     body("description").notEmpty().withMessage("Description is required!"),
     body("imageURLs").isArray({ min: 1 }).withMessage("Atleast one image is required!"),
-    body("price").isNumeric({ gt: 0}).withMessage("Price must be positive!"),
-    body("deliveryDays").isNumeric({ gt: 0}).withMessage("Delivery days must be positive!"),
-    body("revisions").isNumeric({ gt: 0}).withMessage("Number of revisions must be positive!"),
+    body("price").isNumeric({ gt: 0 }).withMessage("Price must be positive!"),
+    body("deliveryDays").isNumeric({ gt: 0 }).withMessage("Delivery days must be positive!"),
+    body("revisions").isNumeric({ gt: 0 }).withMessage("Number of revisions must be positive!"),
 ], protect, createGig);
 
-router.put('/:id', protect, updateGig);
+router.put('/:id', [
+    body("title").notEmpty().withMessage("Title is required!"),
+    body("category").notEmpty().withMessage("Category is required!"),
+    body("description").notEmpty().withMessage("Description is required!"),
+    body("imageURLs").isArray({ min: 1 }).withMessage("Atleast one image is required!"),
+    body("price").isNumeric({ gt: 0 }).withMessage("Price must be positive!"),
+    body("deliveryDays").isNumeric({ gt: 0 }).withMessage("Delivery days must be positive!"),
+    body("revisions").isNumeric({ gt: 0 }).withMessage("Number of revisions must be positive!"),
+], protect, updateGig);
 
 router.patch('/publish-state/:id', protect, updateGigState);
 

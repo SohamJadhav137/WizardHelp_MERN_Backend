@@ -99,6 +99,11 @@ export const deleteGig = async (req, res) => {
 };
 
 export const updateGig = async (req, res) => {
+    const errors = validationResult(req);
+    console.log("Backend validation:\n",errors);
+    if(!errors.isEmpty())
+        return res.status(400).json({ message: errors.array()[0].msg });
+
     try {
         const gig = await Gig.findById(req.params.id);
         if(!gig) return res.status(404).json({ message: "Gig not found!"});
