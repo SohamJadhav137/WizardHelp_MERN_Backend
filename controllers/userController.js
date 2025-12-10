@@ -36,7 +36,6 @@ export const editUserProfile = async (req, res) => {
 
     try{
         const userId = req.params.id;
-        console.log("REQUEST BODY:\n", req.body);
         const user = await User.findById(userId);
 
         if(!user)
@@ -58,3 +57,53 @@ export const editUserProfile = async (req, res) => {
         return res.status(500).json({ error: "Server side error!" });
     }
 }
+
+export const saveProfilePhoto = async (req, res) => {
+    try{
+        const userId = req.params.id;
+
+        const user = await User.findById(userId);
+        
+        if(!user)
+            return res.status(404).json({ error: "User not found!" });
+
+        if(req.user._id.toString() !== userId.toString()){
+            return res.status(403).json({ error: "Only account owner can edit profile photo!" });
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { $set: req.body },
+            { new: true, runValidators: true }
+        );
+
+        res.status(201).json(updatedUser);
+    } catch(error){
+        console.error("CUSTOM ERROR:", error);
+        return res.status(500).json({ error: "Server side error!" });
+    }
+};
+
+export const removeProfilePhoto = async (req, res) => {
+    try{
+        const userId = req.params.id;
+
+        const user = await User.findById(userId);
+        
+        if(!user)
+            return res.status(404).json({ error: "User not found!" });
+
+        if(req.user._id.toString() !== userId.toString()){
+            return res.status(403).json({ error: "Only account owner can remove profile photo!" });
+        }
+
+        user.profilePic = null;
+
+        await user.save();
+
+        res.status(201).json(user);
+    } catch(error){
+        console.error("CUSTOM ERROR:", error);
+        return res.status(500).json({ error: "Server side error!" });
+    }
+};

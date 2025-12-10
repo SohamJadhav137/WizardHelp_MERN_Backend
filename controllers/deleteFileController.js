@@ -15,7 +15,7 @@ export const deleteFileController = async (req, res) => {
         const { fileUrl } = req.body;
 
         if (!fileUrl) {
-            return res.status(400).json({ message: 'File URL not found!' });
+            return res.status(404).json({ message: 'File URL not found!' });
         }
 
         const key = getS3KeyFromUrl(fileUrl);

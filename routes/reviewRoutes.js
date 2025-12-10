@@ -7,7 +7,7 @@ const router = express.Router();
 router.post('/submit', protect, authorizeRoles("buyer"), submitReview);
 router.post('/buyer-rating', protect, authorizeRoles("seller"), submitBuyerRating);
 router.get('/by-order/:id', protect, authorizeRoles("buyer"), fetchSingleReview);
-router.get('/gig-reviews/:id', protect, fetchGigReviews);
+router.get('/gig-reviews/:id', fetchGigReviews);
 router.get('/buyer-rating/:id', protect, fetchBuyerRating);
 
 export default router;

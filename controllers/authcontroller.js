@@ -49,17 +49,17 @@ export const registerUser = async (req, res) => {
     if(!errors.isEmpty())
         return res.status(400).json({ message: errors.array()[0].msg})
     
-    const {username, email, password, role} = req.body;
+    const {username, email, password, country, languages, skills, role} = req.body;
 
     try{
         const existingUser = await User.findOne({email});
         if(existingUser){
-            return res.status(400).json({ message: "User already exists"});
+            return res.status(400).json({ message: "User already exists" });
         }
 
-        const user = await User.create({username, email, password, role});
-        // const token = generateToken(user);
+        const user = await User.create({username, email, password, country, languages, skills, role});
         sendTokenResponse(user, res);
+        // const token = generateToken(user);
 
         // res.status(201).json({
         //     _id: user._id,
