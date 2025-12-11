@@ -4,6 +4,7 @@ import User from "../models/user.js";
 export const createConversation = async (req, res) => {
     try {
         const { sellerId, sellerName, buyerId, buyerName } = req.body;
+        // console.log(`Buyer Id: ${buyerId}\nBuyer Name: ${buyerName}\nSeller Id: ${sellerId}\nSeller Name:${sellerName}`)
 
         const existing = await Conversation.findOne({ sellerId, buyerId });
         if (existing) {
@@ -12,7 +13,7 @@ export const createConversation = async (req, res) => {
 
         const conversation = new Conversation({ sellerId, sellerName, buyerId, buyerName });
         await conversation.save();
-        // res.status(201).json(saved);
+        
         res.status(201).json({ message: "New conversation added to messages" });
 
     } catch (error) {

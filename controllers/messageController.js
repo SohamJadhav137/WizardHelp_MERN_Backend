@@ -1,8 +1,10 @@
 import Conversation from "../models/conversation.js";
 import Message from "../models/message.js";
+import { getIO } from "../socket-io/socket-io.js";
 
 
 export const sendMessage = async (req, res) => {
+    const io = getIO();
     try{
 
         const {conversationId, text} = req.body;
@@ -31,6 +33,10 @@ export const sendMessage = async (req, res) => {
         }
         
         await conv.save();
+
+        io.to(conv._id).emit("lastMsgReceived", {
+            lastMsg: text
+        });
         
         return res.status(201).json(saved);
     } catch(error) {

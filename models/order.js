@@ -27,7 +27,7 @@ const orderSchema = new mongoose.Schema(
         previousStatus: { type: String,  enum: ["active", "delivered", "revision", null], default: null},
         isReviewed: { type: Boolean, default: false},
         isBuyerRated: { type: Boolean, default: false},
-        buyerRating: { type: Number, required: true, min: 1, max: 5, validate: { validator: Number.isInteger, message: "Rating must be an integer!" }}
+        buyerRating: { type: Number, min: 1, max: 5, validate: { validator: Number.isInteger, message: "Rating must be an integer!" }}
     },
     { timestamps: true }
 );
