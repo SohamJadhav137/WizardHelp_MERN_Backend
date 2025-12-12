@@ -6,7 +6,7 @@ const orderSchema = new mongoose.Schema(
         sellerId: { type: mongoose.Types.ObjectId, ref: "User", required: true },
         buyerId: { type: mongoose.Types.ObjectId, ref: "User", required: true },
         price: { type: Number, required: true },
-        status: { type: String, enum: ["active", "delivered", "completed", "revision", "request-cancellation", "cancelled"], default: "active"},
+        status: { type: String, enum: ["requested", "Declined", "active", "delivered", "completed", "revision", "request-cancellation", "cancelled"], default: "requested"},
         deliveryFiles: { type: [
             {
                 url: { type: String, required: true},
@@ -19,7 +19,7 @@ const orderSchema = new mongoose.Schema(
         buyerNote: { type: String, default: "" },
         deliveredAt: { type: Date, default: null },
         completedAt: { type: Date, default: null },
-        dueDate: { type: Date, required: true},
+        dueDate: { type: Date, default: null},
         totalRevisions: { type: Number, required: true },
         revisionCount: { type: Number, default: 0 },
         cancellationRequestedBy: { type: String, enum: ['buyer', 'seller'], default: null},

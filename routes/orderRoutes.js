@@ -1,10 +1,11 @@
 import express from "express";
-import { createOrder, getOrders, markAsDelivered, getSingleOrder, markAsCompleted, requestRevision, requestCancellation, accepteOrderCancelRequest, rejectOrderCancelRequest } from "../controllers/orderController.js";
+import { createOrder, getOrders, markAsDelivered, getSingleOrder, markAsCompleted, requestRevision, requestCancellation, accepteOrderCancelRequest, rejectOrderCancelRequest, initiateOrder } from "../controllers/orderController.js";
 import { authorizeRoles, protect } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
-router.post('/:gigId', protect, createOrder);
+router.post('/:id/order-request', protect, authorizeRoles("seller"), initiateOrder);
+router.post('/:id', protect, authorizeRoles("buyer"), createOrder);
 router.get('/:id', protect, getSingleOrder);
 router.get('/', protect, getOrders);
 router.patch('/:id/deliver', protect, authorizeRoles("seller"), markAsDelivered);

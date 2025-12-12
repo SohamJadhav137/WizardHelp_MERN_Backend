@@ -5,26 +5,22 @@ import { getIO } from "../socket-io/socket-io.js";
 export const createOrder = async (req, res) => {
     const io = getIO();
     try {
-        const gig = await Gig.findById(req.params.gigId);
+        const gig = await Gig.findById(req.params.id);
         if (!gig) res.status(404).json({ message: "Gig not found!" });
         if (req.user.id.toString() === gig.userId.toString())
             return res.status(403).json({ message: "You cannot buy your own gig!" });
-
-        const initalDeliveryDays = gig.deliveryDays;
-        const dueDate = new Date(Date.now() + initalDeliveryDays * 24 * 60 * 60 * 1000);
 
         const newOrder = new Order({
             gigId: gig._id,
             buyerId: req.user._id,
             sellerId: gig.userId,
             price: gig.price,
-            dueDate: dueDate,
             totalRevisions: gig.revisions
         });
 
         await newOrder.save();
 
-        io.to(gig.userId.toString()).emit("newOrderReceive", {
+        io.to(gig.userId.toString()).emit("orderReceived", {
             createdOrder: newOrder
         });
 
@@ -34,6 +30,59 @@ export const createOrder = async (req, res) => {
         res.status(500).json({ message: "Failed to create the order!" });
     }
 };
+
+export const initiateOrder = async (req, res) => {
+    const io = getIO();
+    try {
+        const { sellerResponse, orderRejectNote } = req.body;
+        const order = await Order.findById(req.params.id);
+
+        if (!order)
+            res.status(400).json({ message: "Order not found!" });
+
+        // If seller rejects the order
+        if (!sellerResponse) {
+            order.sellerNote = orderRejectNote;
+            order.status = "Declined";
+
+            await order.save();
+
+            io.to(order.buyerId.toString()).emit("orderDeclined", {
+                updatedOrder: order
+            });
+
+            io.to(order.sellerId.toString()).emit("orderDeclined", {
+                updatedOrder: order
+            });
+            return res.status(200).json({ success: false, message: 'Order request declined by seller!' });
+        }
+
+        order.status = "active";
+
+        const gig = await Gig.findById(order.gigId);
+        if (!gig) res.status(404).json({ message: "Gig not found!" });
+
+        const initalDeliveryDays = gig.deliveryDays;
+        const dueDate = new Date(Date.now() + initalDeliveryDays * 24 * 60 * 60 * 1000);
+
+        order.dueDate = dueDate;
+
+        await order.save();
+
+        io.to(order.buyerId.toString()).emit("orderInitiated", {
+            updatedOrder: order
+        });
+
+        io.to(order.sellerId.toString()).emit("orderInitiated", {
+            updatedOrder: order
+        });
+
+        res.status(201).json({ success: true, message: "Order has initiated!" });
+    } catch (error) {
+        console.error("CUSTOM ERROR:", error);
+        res.status(500).json({ message: "Failed to initiate the order!" });
+    }
+}
 
 export const getOrders = async (req, res) => {
     try {
@@ -206,7 +255,7 @@ export const requestCancellation = async (req, res) => {
         order.status = "request-cancellation";
         order.cancellationRequestedBy = req.user.role;
         order.cancellationReason = cancellationReason;
-        
+
         await order.save();
 
         io.to(order.sellerId.toString()).emit("orderCancellationRequest", {
@@ -254,7 +303,7 @@ export const accepteOrderCancelRequest = async (req, res) => {
             res.status(200).json({ message: "Seller accepted order cancellation request. Order was cancelled successfully" });
         else
             res.status(200).json({ message: "Buyer accepted order cancellation request. Order was cancelled successfully" });
-        
+
 
     } catch (error) {
         console.error("CUSTOM ERROR:\n", error);
@@ -264,7 +313,7 @@ export const accepteOrderCancelRequest = async (req, res) => {
 
 export const rejectOrderCancelRequest = async (req, res) => {
     const io = getIO();
-    try{
+    try {
         const order = await Order.findById(req.params.id);
 
         if (!order)
