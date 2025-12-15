@@ -31,7 +31,7 @@ export const submitReview = async (req, res) => {
 
         gig.totalReviews += 1;
         gig.totalRatingSum += rating;
-        gig.starRating = gig.totalRatingSum / gig.totalReviews;
+        gig.starRating = Math.round((gig.totalRatingSum / gig.totalReviews) * 10) / 10;
 
         await gig.save();
 
@@ -89,7 +89,7 @@ export const submitBuyerRating = async (req, res) => {
 
         buyer.ratingSum += rating;
         buyer.ratingCount += 1;
-        buyer.rating = buyer.ratingSum / buyer.ratingCount;
+        buyer.rating = ((buyer.ratingSum / buyer.ratingCount) * 10) / 10;
 
         await buyer.save();
 

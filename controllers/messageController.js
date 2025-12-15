@@ -51,7 +51,7 @@ export const getMessages = async (req, res) => {
         return res.status(400).json({ message: "CoversationId required!"});
 
     try {
-        const messages = await Message.find({ conversationId }).populate('senderId', 'username').sort({ createdAt: 1 });        
+        const messages = await Message.find({ conversationId }).populate('senderId', 'username profilePic').sort({ createdAt: 1 });        
         return res.status(200).json(messages);
     } catch(error) {
         console.error("CUSTOM ERROR:",error);

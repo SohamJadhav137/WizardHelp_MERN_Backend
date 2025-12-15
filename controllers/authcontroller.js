@@ -39,6 +39,7 @@ const sendTokenResponse = (user, res) => {
             username: user.username,
             email: user.email,
             role: user.role,
+            profilePic: user.profilePic,
             message: "Token created successfully",
             token
         });

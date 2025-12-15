@@ -1,28 +1,27 @@
 import express from "express";
 import dotenv from "dotenv";
-// It loads .env variables into process.env
+
 dotenv.config();
+
 import cors from "cors";
 import connectDB from "./config/db.js";
+import http from "http";
+import { initSocket } from "./socket-io/socket-io.js";
+
 import authRoutes from "./routes/authRoutes.js";
 import gigsRoutes from "./routes/gigsRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import conversationRoutes from "./routes/conversationRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
-
-import http from "http";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import catRoutes from './routes/catRoutes.js';
 import deleteRoute from "./routes/deleteFileRoute.js";
 import userRoutes from "./routes/userRoutes.js";
-import { initSocket } from "./socket-io/socket-io.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 
 const app = express();
 
 app.use(cors({origin: "http://localhost:5173", methods: ["GET", "POST", "DELETE", "PUT", "PATCH"], credentials: true}));
-// cors: cross origin resource sharing
-// credentials: It allows requests to include credentials like cookies, authorization headers, JWT in cookies etc. 
 
 const server = http.createServer(app);
 

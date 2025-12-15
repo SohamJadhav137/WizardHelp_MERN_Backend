@@ -65,8 +65,8 @@ export const getSingleConversation = async (req, res) => {
             res.status(200).json(conversation);
         }
 
-        const buyer = await User.findById(buyerId).select("username");
-        const seller = await User.findById(sellerId).select("username");
+        const buyer = await User.findById(buyerId).select("username profilePic");
+        const seller = await User.findById(sellerId).select("username profilePic");
 
         conversation = new Conversation({
             sellerId,
@@ -84,13 +84,16 @@ export const getSingleConversation = async (req, res) => {
 }
 
 export const singleConv = async (req, res) => {
-    const { convId } = req.params.id;
-    // try{
-    //     if(!convId){
-    //         return res.status(404).json({ error: 'Conversation not found!' });
-    //     }
+    const convId = req.params.id;
+    try{
+        if(!convId){
+            return res.status(404).json({ error: 'Conversation not found!' });
+        }
 
-    //     const conv = await Conversation.findById(convId);
-
-    // }
+        const conv = await Conversation.findById(convId);
+        res.status(200).json(conv);
+    } catch(error){
+        console.error('CUSTOM ERROR:', error);
+        return res.status(500).json({ message: 'Failed to retrieve single conversation!' });
+    }
 }

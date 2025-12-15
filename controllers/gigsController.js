@@ -5,6 +5,7 @@ import { deleteAllFilesFromS3 } from "../utils/deleteAllFilesFromS3.js";
 export const createGig = async (req, res) => {
     const errors = validationResult(req);
     console.log("Backend validation:\n",errors);
+    
     if(!errors.isEmpty())
         return res.status(400).json({ message: errors.array()[0].msg })
     
