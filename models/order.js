@@ -15,6 +15,7 @@ const orderSchema = new mongoose.Schema(
                 fileSize: { type: Number, required: true},
             }
         ], default: []},
+        orderReq: { type: String, default: "" },
         sellerNote: { type: String, default: "" },
         buyerNote: { type: String, default: "" },
         deliveredAt: { type: Date, default: null },

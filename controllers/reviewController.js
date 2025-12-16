@@ -70,7 +70,7 @@ export const fetchSingleReview = async (req, res) => {
 
 export const fetchGigReviews = async (req, res) => {
     try{
-        const reviews = await Review.find({ gigId: req.params.id }).populate("buyerId", "username").sort({ createdAt: -1 });
+        const reviews = await Review.find({ gigId: req.params.id }).populate("buyerId", "username country").sort({ createdAt: -1 });
 
         if(!reviews)
             return res.status(404).json({ error: "Gig has no reviews" });

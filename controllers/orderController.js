@@ -5,6 +5,7 @@ import { getIO } from "../socket-io/socket-io.js";
 export const createOrder = async (req, res) => {
     const io = getIO();
     try {
+        const { buyerRequirement } = req.body;
         const gig = await Gig.findById(req.params.id);
         if (!gig) res.status(404).json({ message: "Gig not found!" });
         if (req.user.id.toString() === gig.userId.toString())
@@ -15,7 +16,8 @@ export const createOrder = async (req, res) => {
             buyerId: req.user._id,
             sellerId: gig.userId,
             price: gig.price,
-            totalRevisions: gig.revisions
+            totalRevisions: gig.revisions,
+            orderReq: buyerRequirement
         });
 
         await newOrder.save();
