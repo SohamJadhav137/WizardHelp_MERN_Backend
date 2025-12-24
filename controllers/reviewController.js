@@ -42,7 +42,7 @@ export const submitReview = async (req, res) => {
         const seller = await User.findById(sellerId);
         seller.ratingSum += rating;
         seller.ratingCount += 1;
-        seller.rating = seller.ratingSum / seller.ratingCount;
+        seller.rating = Math.round((seller.ratingSum / seller.ratingCount) * 10) / 10;
 
         await seller.save();
         
@@ -89,7 +89,7 @@ export const submitBuyerRating = async (req, res) => {
 
         buyer.ratingSum += rating;
         buyer.ratingCount += 1;
-        buyer.rating = ((buyer.ratingSum / buyer.ratingCount) * 10) / 10;
+        buyer.rating = Math.round((buyer.ratingSum / buyer.ratingCount) * 10) / 10;
 
         await buyer.save();
 
