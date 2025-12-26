@@ -20,6 +20,7 @@ const orderSchema = new mongoose.Schema(
         buyerNote: { type: String, default: "" },
         deliveredAt: { type: Date, default: null },
         completedAt: { type: Date, default: null },
+        startDate: { type: Date, default: null },
         dueDate: { type: Date, default: null},
         totalRevisions: { type: Number, required: true },
         revisionCount: { type: Number, default: 0 },

@@ -61,6 +61,16 @@ export const initiateOrder = async (req, res) => {
 
         order.status = "active";
 
+        const startDate = new Date();
+        const options = {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            timeZone: "UTC"
+        };
+        const startDateFinal = startDate.toLocaleDateString('en-US', options);
+        order.startDate = startDateFinal
+
         const gig = await Gig.findById(order.gigId);
         if (!gig) res.status(404).json({ message: "Gig not found!" });
 
