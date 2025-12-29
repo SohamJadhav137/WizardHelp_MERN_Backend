@@ -1,7 +1,5 @@
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { getS3KeyFromUrl } from "../utils/getS3KeyFromUrl.js";
 import { S3Client } from "@aws-sdk/client-s3";
-
 
 export const deleteFileController = async (req, res) => {
     try {
@@ -12,16 +10,10 @@ export const deleteFileController = async (req, res) => {
                 secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
             }
         });
-        const { fileUrl } = req.body;
-
-        if (!fileUrl) {
-            return res.status(404).json({ message: 'File URL not found!' });
-        }
-
-        const key = getS3KeyFromUrl(fileUrl);
+        const { key } = req.body;
 
         if (!key) {
-            return res.status(400).json({ message: 'Cannot parse s3 key!' });
+            return res.status(404).json({ message: 'File key is missing!' });
         }
 
         const params = {

@@ -1,6 +1,5 @@
 import express from "express";
 import dotenv from "dotenv";
-
 dotenv.config();
 
 import cors from "cors";
@@ -18,6 +17,8 @@ import catRoutes from './routes/catRoutes.js';
 import deleteRoute from "./routes/deleteFileRoute.js";
 import userRoutes from "./routes/userRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
+import downloadRoute from "./routes/downloadRoute.js";
+import previewRoute from "./routes/previewRoute.js";
 
 const app = express();
 
@@ -52,10 +53,12 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/conversations', conversationRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/download', downloadRoute);
 app.use('/api/category', catRoutes);
 app.use('/api/s3', deleteRoute);
 app.use('/api/user', userRoutes);
 app.use('/api/review', reviewRoutes);
+app.use('/api/preview', previewRoute);
 
 const PORT = process.env.PORT || 5000;
 

@@ -25,9 +25,9 @@ export const getPresignedUrl = async (req, res) => {
         const uploadCommand = new PutObjectCommand(params);
         const uploadURL = await getSignedUrl(s3, uploadCommand, { expiresIn: 60 });
         
-        const fileURL = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${params.Key}`;
+        // const fileURL = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${params.Key}`;
         
-        res.status(200).json({ uploadURL, fileURL });
+        res.status(200).json({ uploadURL, key: params.Key, fileName });
     } catch(error){
         console.error("CUSTOM ERROR:",error);
         res.status(500).json({ message: "Failed to generate presigned URL" });

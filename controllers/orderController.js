@@ -115,7 +115,7 @@ export const markAsDelivered = async (req, res) => {
     const io = getIO();
     try {
         const { deliveryFiles, sellerNote } = req.body;
-        // console.log("Delivery Files:\n", deliveryFiles);
+        console.log("Delivery Files:\n", deliveryFiles);
         // console.log("Seller Note:\n", sellerNote);
         // console.log("Files length:", deliveryFiles.length);
         if (!Array.isArray(deliveryFiles) || deliveryFiles.length === 0) {
@@ -124,18 +124,15 @@ export const markAsDelivered = async (req, res) => {
         const order = await Order.findById(req.params.id);
         if (!order) return res.status(404).json({ message: "Order not found!" });
 
-        // console.log("Requesting userId:", req.user.id);
-        // console.log("Buyer Id:", order.buyerId.toString());
-
         if (req.user._id.toString() === order.buyerId.toString())
             return res.status(403).json({ message: "Only seller can mark order as delivered!" });
 
         order.status = "delivered";
         order.deliveryFiles = deliveryFiles.map(file => ({
-            url: file.url,
-            fileName: file.name,
-            fileType: file.type,
-            fileSize: file.size
+            key: file.key,
+            fileName: file.fileName,
+            fileType: file.fileType,
+            fileSize: file.fileSize
         }));
 
         order.sellerNote = sellerNote;

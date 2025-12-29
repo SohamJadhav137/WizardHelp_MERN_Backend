@@ -9,7 +9,7 @@ const orderSchema = new mongoose.Schema(
         status: { type: String, enum: ["requested", "Declined", "active", "delivered", "completed", "revision", "request-cancellation", "cancelled"], default: "requested"},
         deliveryFiles: { type: [
             {
-                url: { type: String, required: true},
+                key: { type: String, required: true },
                 fileName: { type: String, required: true},
                 fileType: { type: String, required: true},
                 fileSize: { type: Number, required: true},
