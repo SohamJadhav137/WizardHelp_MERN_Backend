@@ -225,6 +225,7 @@ export const requestRevision = async (req, res) => {
 
         order.status = "revision";
         order.buyerNote = buyerNote;
+        order.deliveryFiles = [];
 
         if (order.revisionCount === order.totalRevisions) {
             return res.status(400).json({ message: "Revision limit reached!" });
@@ -234,6 +235,8 @@ export const requestRevision = async (req, res) => {
             order.deliveryFiles = []
         }
 
+        await order.save();
+
         io.to(order.sellerId.toString()).emit("orderRevision", {
             updatedOrder: order
         });
@@ -241,8 +244,6 @@ export const requestRevision = async (req, res) => {
         io.to(order.buyerId.toString()).emit("orderRevision", {
             updatedOrder: order
         });
-
-        await order.save();
 
         res.status(200).json({ message: "Revision request is sent to seller" });
     } catch (error) {

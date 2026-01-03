@@ -10,21 +10,21 @@ export const deleteFileController = async (req, res) => {
                 secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
             }
         });
-        const { key } = req.body;
+        const { s3Key } = req.body;
 
-        if (!key) {
-            return res.status(404).json({ message: 'File key is missing!' });
+        if (!s3Key) {
+            return res.status(400).json({ message: 'File key is missing!' });
         }
 
         const params = {
             Bucket: process.env.S3_BUCKET_NAME,
-            Key: key
+            Key: s3Key
         };
 
         const deleteCommand = new DeleteObjectCommand(params);
         await s3Client.send(deleteCommand);
 
-        console.log(`Deleted successfully S3 object: ${key}`);
+        console.log(`Deleted successfully S3 object: ${s3Key}`);
         res.status(200).json({ message: 'File deleted successfully from S3' });
     } catch (error) {
         console.error('S3 CUSTOM ERROR:', error);
