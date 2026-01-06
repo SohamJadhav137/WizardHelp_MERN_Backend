@@ -122,3 +122,19 @@ export const logoutUser = (req, res) => {
 
     res.json({ message: "Logged out successfully" })
 };
+
+export const checkAvailability = async (req, res) => {
+    const { field, value } = req.query;
+
+    try{
+        const user = await User.findOne({ [field]: value.toLowerCase() });
+
+        if(user){
+            return res.status(200).json({ available: false, message: `Already exists`})
+        }
+
+        return res.status(200).json({ available: true });
+    } catch(error){
+        res.status(500).json({ message: "Server error while checking avaialbility!" });
+    }
+};
