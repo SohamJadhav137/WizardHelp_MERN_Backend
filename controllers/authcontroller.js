@@ -50,12 +50,16 @@ export const registerUser = async (req, res) => {
     if(!errors.isEmpty())
         return res.status(400).json({ message: errors.array()[0].msg})
     
-    const {username, email, password, country, languages, skills, role} = req.body;
+    const {username, email, password, country, languages, skills = [], role} = req.body;
 
     try{
-        const existingUser = await User.findOne({email});
+        const existingUser = await User.findOne({
+            $or: [{email}, {username}]
+        });
+
         if(existingUser){
-            return res.status(400).json({ message: "User already exists" });
+            const field = existingUser.email === email ? 'Email': 'Username'
+            return res.status(400).json({ message: `${field} already exists!` });
         }
 
         const user = await User.create({username, email, password, country, languages, skills, role});
@@ -125,10 +129,15 @@ export const logoutUser = (req, res) => {
 
 export const checkAvailability = async (req, res) => {
     const { field, value } = req.query;
+    // console.log("field:", field, "email:", value);
+
+    const allowedFields = ['username', 'email'];
+    if(!allowedFields.includes(field)){
+        return res.status(400).json({ message: "Invaild field request!"});
+    }
 
     try{
-        const user = await User.findOne({ [field]: value.toLowerCase() });
-
+        const user = await User.findOne({ [field]: { $regex: new RegExp(`^${value}$`, 'i') } });
         if(user){
             return res.status(200).json({ available: false, message: `Already exists`})
         }
