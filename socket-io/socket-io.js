@@ -5,6 +5,7 @@ import Conversation from "../models/conversation.js";
 let io = null;
 
 export const initSocket = (server) => {
+    console.log("Init socket initiated!!!")
     io = new Server(server, {
         cors: {
             origin: 'http://localhost:5173',
@@ -16,13 +17,19 @@ export const initSocket = (server) => {
     // Things to perform after client connects with the server
     io.on("connection", (socket) => {
         const { userId, username } = socket.handshake.auth;
+
+        if(!userId){
+            socket.disconnect();
+            return;
+        }
+
         socket.userId = userId;
         socket.username = username;
-        console.log(`🟢 Backend connected at socket id: ${socket.id}`);
+        console.log(`🟢 Backend connected to frontend at socket id: ${socket.id}`);
 
-        socket.on("joinRoom", (userId) => {
+        socket.on("join-user-room", (userId) => {
             socket.join(userId);
-            console.log(`User ${socket.username} joined room`);
+            console.log(`User ${socket.username} joined its own room at id: ${userId}`);
         });
 
         socket.on("join_conversation", (conversationId) => {
@@ -73,8 +80,8 @@ export const initSocket = (server) => {
             }
         })
 
-        socket.on("disconnect", () => {
-            console.log(`🔴 ${username} got disconnected from socket id: ${socket.id}`);
+        socket.on("disconnect", (reason) => {
+            console.log(`🔴 Frontend got disconnected from socket ${reason}`);
         });
     });
 
