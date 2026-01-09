@@ -28,12 +28,12 @@ export const initSocket = (server) => {
         console.log(`🟢 Backend connected to frontend at socket id: ${socket.id}`);
 
         socket.on("join-user-room", (userId) => {
-            socket.join(userId);
+            socket.join(`user:${userId}`);
             console.log(`User ${socket.username} joined its own room at id: ${userId}`);
         });
 
         socket.on("join_conversation", (conversationId) => {
-            socket.join(conversationId);
+            socket.join(`conv:${conversationId}`);
             console.log(`💬 ${username} joined conversation of Id: ${conversationId}`);
         });
 
@@ -49,7 +49,7 @@ export const initSocket = (server) => {
 
                 const savedMessage = await newMessage.save();
 
-                await Conversation.findByIdAndUpdate(
+                const updatedConv = await Conversation.findByIdAndUpdate(
                     messageData.conversationId,
                     {
                         lastMessage: messageData.text,
@@ -66,7 +66,21 @@ export const initSocket = (server) => {
                     }
                 };
 
-                io.to(messageData.conversationId).emit("receive_message", broadcastMessage);
+                io.to(`conv:${messageData.conversationId}`).emit("receive_message", broadcastMessage);
+
+                const { buyerId, sellerId } = updatedConv;
+
+                io.to(`user:${buyerId}`).emit('last_message_update', {
+                    conversationId: updatedConv._id,
+                    lastMessage: updatedConv.lastMessage,
+                    updatedAt: updatedConv.updatedAt
+                });
+
+                io.to(`user:${sellerId}`).emit('last_message_update', {
+                    conversationId: updatedConv._id,
+                    lastMessage: updatedConv.lastMessage,
+                    updatedAt: updatedConv.updatedAt
+                });
             } catch (error) {
                 console.error("CUSTOM ERROR:", error);
                 socket.emit('messageError', { text: 'Failed to send message!' });
