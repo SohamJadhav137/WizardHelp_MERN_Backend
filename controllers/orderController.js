@@ -22,7 +22,7 @@ export const createOrder = async (req, res) => {
 
         await newOrder.save();
 
-        io.to(gig.userId.toString()).emit("orderReceived", {
+        io.to(`user:${gig.userId.toString()}`).emit("orderReceived", {
             createdOrder: newOrder
         });
 
@@ -49,11 +49,11 @@ export const initiateOrder = async (req, res) => {
 
             await order.save();
 
-            io.to(order.buyerId.toString()).emit("orderDeclined", {
+            io.to(`user:${order.buyerId.toString()}`).emit("orderDeclined", {
                 updatedOrder: order
             });
 
-            io.to(order.sellerId.toString()).emit("orderDeclined", {
+            io.to(`user:${order.sellerId.toString()}`).emit("orderDeclined", {
                 updatedOrder: order
             });
             return res.status(200).json({ success: false, message: 'Order request declined by seller!' });
@@ -81,11 +81,11 @@ export const initiateOrder = async (req, res) => {
 
         await order.save();
 
-        io.to(order.buyerId.toString()).emit("orderInitiated", {
+        io.to(`user:${order.buyerId.toString()}`).emit("orderInitiated", {
             updatedOrder: order
         });
 
-        io.to(order.sellerId.toString()).emit("orderInitiated", {
+        io.to(`user:${order.sellerId.toString()}`).emit("orderInitiated", {
             updatedOrder: order
         });
 
@@ -115,7 +115,7 @@ export const markAsDelivered = async (req, res) => {
     const io = getIO();
     try {
         const { deliveryFiles, sellerNote } = req.body;
-        console.log("Delivery Files:\n", deliveryFiles);
+        // console.log("Delivery Files:\n", deliveryFiles);
         // console.log("Seller Note:\n", sellerNote);
         // console.log("Files length:", deliveryFiles.length);
         if (!Array.isArray(deliveryFiles) || deliveryFiles.length === 0) {
@@ -140,11 +140,11 @@ export const markAsDelivered = async (req, res) => {
 
         await order.save();
 
-        io.to(order.buyerId.toString()).emit("orderDelivered", {
+        io.to(`user:${order.buyerId.toString()}`).emit("orderDelivered", {
             updatedOrder: order
         });
 
-        io.to(order.sellerId.toString()).emit("orderDelivered", {
+        io.to(`user:${order.sellerId.toString()}`).emit("orderDelivered", {
             updatedOrder: order
         });
 
@@ -165,7 +165,7 @@ export const markAsCompleted = async (req, res) => {
         if (!order)
             return res.status(404).json({ error: "Order not found" });
 
-        if (req.user.id.toString() === order.sellerId.toString()) {
+        if (req.user.id.toString() === `user:${order.sellerId.toString()}`) {
             return res.status(403).json({ error: "Only buyer can mark order as complete" })
         }
 
@@ -179,11 +179,11 @@ export const markAsCompleted = async (req, res) => {
             $inc: { orders: 1 }
         });
 
-        io.to(order.sellerId.toString()).emit("orderCompleted", {
+        io.to(`user:${order.sellerId.toString()}`).emit("orderCompleted", {
             updatedOrder: order
         });
 
-        io.to(order.buyerId.toString()).emit("orderCompleted", {
+        io.to(`user:${order.buyerId.toString()}`).emit("orderCompleted", {
             updatedOrder: order
         });
 
@@ -237,11 +237,11 @@ export const requestRevision = async (req, res) => {
 
         await order.save();
 
-        io.to(order.sellerId.toString()).emit("orderRevision", {
+        io.to(`user:${order.sellerId.toString()}`).emit("orderRevision", {
             updatedOrder: order
         });
 
-        io.to(order.buyerId.toString()).emit("orderRevision", {
+        io.to(`user:${order.buyerId.toString()}`).emit("orderRevision", {
             updatedOrder: order
         });
 
@@ -268,11 +268,11 @@ export const requestCancellation = async (req, res) => {
 
         await order.save();
 
-        io.to(order.sellerId.toString()).emit("orderCancellationRequest", {
+        io.to(`user:${order.sellerId.toString()}`).emit("orderCancellationRequest", {
             updatedOrder: order
         });
 
-        io.to(order.buyerId.toString()).emit("orderCancellationRequest", {
+        io.to(`user:${order.buyerId.toString()}`).emit("orderCancellationRequest", {
             updatedOrder: order
         });
 
@@ -301,11 +301,11 @@ export const accepteOrderCancelRequest = async (req, res) => {
 
         await order.save();
 
-        io.to(order.sellerId.toString()).emit("orderCancelAccept", {
+        io.to(`user:${order.sellerId.toString()}`).emit("orderCancelAccept", {
             updatedOrder: order
         });
 
-        io.to(order.buyerId.toString()).emit("orderCancelAccept", {
+        io.to(`user:${order.buyerId.toString()}`).emit("orderCancelAccept", {
             updatedOrder: order
         });
 
@@ -334,11 +334,11 @@ export const rejectOrderCancelRequest = async (req, res) => {
 
         await order.save();
 
-        io.to(order.sellerId.toString()).emit("orderCancelReject", {
+        io.to(`user:${`user:${order.sellerId.toString()}`}`).emit("orderCancelReject", {
             updatedOrder: order
         });
 
-        io.to(order.buyerId.toString()).emit("orderCancelReject", {
+        io.to(`user:${order.buyerId.toString()}`).emit("orderCancelReject", {
             updatedOrder: order
         });
 
