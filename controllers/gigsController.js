@@ -150,3 +150,30 @@ export const updateGigState = async (req, res) => {
         res.status(500).json({ message: "Some BACKEND error occured while updating gig's state!"});
     }
 };
+
+export const getBestGigs = async (req, res) => {
+    try{
+        const gigs = await Gig.aggregate([
+            { $sort: { orders: -1 } },
+
+            {
+                $group: {
+                    _id: "$category",
+                    gig: { $first: "$$ROOT" }
+                }
+            },
+
+            {
+                $project: {
+                    _id: 0,
+                    category: "$_id",
+                    gig: 1
+                }
+            }
+        ]);
+
+        res.status(200).json(gigs);
+    } catch(error){
+        req.status(500).json({ message: "Failed to fetch best gigs" });
+    }
+};
