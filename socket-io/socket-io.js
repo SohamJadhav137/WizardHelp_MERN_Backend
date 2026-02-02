@@ -88,14 +88,16 @@ export const initSocket = (server) => {
         });
 
         socket.on("leave_conversation", (conversationId) => {
-            if (socket.rooms.has(conversationId)) {
+            const room = `conv:${conversationId}`;
+
+            if (socket.rooms.has(room)) {
                 socket.leave(conversationId);
-                console.log(`💬 ❌${socket.username} left conversation room Id: ${conversationId}`);
+                console.log(`❌ ${socket.username} left conversation room Id: ${conversationId}`);
             }
         })
 
         socket.on("disconnect", (reason) => {
-            console.log(`🔴 Frontend got disconnected from socket ${reason}`);
+            console.log(`🔴 Frontend got disconnected from socket | Reason: ${reason}`);
         });
     });
 

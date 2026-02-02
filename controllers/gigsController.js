@@ -112,10 +112,17 @@ export const updateGig = async (req, res) => {
         if(req.user._id.toString() !== gig.userId.toString())
             return res.status(403).json({ message: "Only gig owner can update the gig!"});
 
+        const { imageURLs } = req.body;
+
+        const updatedData = {
+            ...req.body,
+            coverImageURL: imageURLs ? imageURLs[0] : ''
+        };
+
         const updatedGig = await Gig.findByIdAndUpdate(
             req.params.id,
-            { $set: req.body },
-            { new: true, runValidators: true}
+            { $set: updatedData },
+            { new: true, runValidators: true }
         );
 
         res.status(200).json(updatedGig);
