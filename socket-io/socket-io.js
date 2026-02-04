@@ -13,7 +13,6 @@ export const initSocket = (server) => {
         }
     });
 
-
     // Things to perform after client connects with the server
     io.on("connection", (socket) => {
         const { userId, username } = socket.handshake.auth;
@@ -25,10 +24,10 @@ export const initSocket = (server) => {
 
         socket.userId = userId;
         socket.username = username;
-        console.log(`🟢 Backend connected to frontend at socket id: ${socket.id}`);
+        console.log(`🟢 Backend connected to frontend (${username}) at socket id: ${socket.id}`);
 
-        socket.on("join-user-room", (userId) => {
-            socket.join(`user:${userId}`);
+        socket.on("join-user-room", () => {
+            socket.join(`user:${socket.userId}`);
             console.log(`User ${socket.username} joined its own room at id: ${userId}`);
         });
 
@@ -94,16 +93,16 @@ export const initSocket = (server) => {
                 socket.leave(conversationId);
                 console.log(`❌ ${socket.username} left conversation room Id: ${conversationId}`);
             }
-        })
+        });
 
         socket.on("disconnect", (reason) => {
-            console.log(`🔴 Frontend got disconnected from socket | Reason: ${reason}`);
+            console.log(`🔴 Frontend (${username}) got disconnected from socket | Reason: ${reason}`);
+            // console.log("🔴 Frontend disconnected!!!!!!");
         });
     });
 
     return io;
 }
-
 
 export const getIO = () => {
     return io;
