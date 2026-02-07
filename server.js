@@ -22,7 +22,14 @@ import previewRoute from "./routes/previewRoute.js";
 
 const app = express();
 
-app.use(cors({origin: "http://localhost:5173", methods: ["GET", "POST", "DELETE", "PUT", "PATCH"], credentials: true}));
+app.use(cors({
+    origin: [
+        "http://localhost:5173",
+        "https://wizardhelp.vercel.app"
+    ],
+    methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
+    credentials: true
+}));
 
 const server = http.createServer(app);
 
@@ -40,13 +47,13 @@ connectDB();
 // app.use(cookieParser());
 
 // app.get('/api/logged-in', protect, (req, res) => {
-    //     res.json({ message: `Welcome ${req.user.name}`, user: req.user });
-    // });
-    
+//     res.json({ message: `Welcome ${req.user.name}`, user: req.user });
+// });
+
 // app.get('/api/seller-only', protect, authorizeRoles("seller"), (req, res) => {
-    //     res.json({ message: `Hello seller ${req.user.name}`});
-    // });
-        
+//     res.json({ message: `Hello seller ${req.user.name}`});
+// });
+
 app.use('/api/auth', authRoutes);
 app.use('/api/gigs', gigsRoutes);
 app.use('/api/orders', orderRoutes);
