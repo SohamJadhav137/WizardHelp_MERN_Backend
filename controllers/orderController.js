@@ -6,8 +6,14 @@ export const createOrder = async (req, res) => {
     const io = getIO();
     try {
         const { buyerRequirement } = req.body;
+        const { id } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(404).json({ message: "Gig not found" });
+        }
         const gig = await Gig.findById(req.params.id);
-        if (!gig) res.status(404).json({ message: "Gig not found!" });
+        if (!gig) return res.status(404).json({ message: "Gig not found!" });
+        if (!gig.isPublished) return res.status(404).json({ message: "Gig not found!" });
         if (req.user.id.toString() === gig.userId.toString())
             return res.status(403).json({ message: "You cannot buy your own gig!" });
 

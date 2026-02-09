@@ -48,6 +48,7 @@ export const getSingleGig = async (req, res) => {
     try {
         const gig = await Gig.findById(req.params.id);
         if (!gig) return res.status(404).json({ message: "Gig not found!" });
+        if (!gig.isPublished) return res.status(404).json({ message: "Gig not found!" });
 
         let isVideo = false;
         let mediaURLs = [...gig.imageURLs];
@@ -151,7 +152,7 @@ export const updateGigState = async (req, res) => {
             { new: true }
         );
 
-        res.status(200).json(updateGig);
+        res.status(200).json(updatedGig);
     } catch (error) {
         console.error("CUSTOM ERROR:", error);
         res.status(500).json({ message: "Some BACKEND error occured while updating gig's state!" });
