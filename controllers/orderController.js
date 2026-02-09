@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Gig from "../models/Gig.js";
 import Order from "../models/order.js";
 import { getIO } from "../socket-io/socket-io.js";
@@ -9,7 +10,8 @@ export const createOrder = async (req, res) => {
         const { id } = req.params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(404).json({ message: "Gig not found" });
+            return res.st
+            atus(404).json({ message: "Gig not found" });
         }
         const gig = await Gig.findById(req.params.id);
         if (!gig) return res.status(404).json({ message: "Gig not found!" });
